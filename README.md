@@ -1,56 +1,67 @@
-# Welcome to your Expo app 👋
+working of the app
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+About project:
 
-## Get started
 
-1. Install dependencies
+### user's
+1. store owner
+2. user
 
-   ```bash
-   npm install
-   ```
 
-2. Start the app
+## store owner
+- create store and sub store can be created. as there is limit of 1 sub store. {
+   storeName:"fruits Mart", // string
+   wantSubStore:false, // boolean
+   subStore:{
+      subStoreName: "Mango House", // string
+      _id: "A123" // string 
+   }
+}
 
-   ```bash
-   npx expo start
-   ```
+- can create listing/product {
+   _id:123, // string
+   title:Apple, //string
+   stock:2, // number
+   price:$123 // number
+   region: mohali // string (region will be depend on store location)
+   underSubStore:true // boolean
+}
 
-In the output, you'll find options to open the app in a
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## user
+- login using phone and set current location in popup.
+- can see listing/product/store without login but cant add to cart untill he/she login.
+- once login open a popup for the setuping up location on based on that location, show the store.
+- add COD Payment method with assign to select delivering partner (another scrope of application).
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-## Get a fresh project
 
-When you're ready, run:
 
-```bash
-npm run reset-project
-```
+<!-- screens -->
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Screen
 
-### Other setup steps
+1. Home
+   - intro (about app)
+   - category ["vegies","Electronics","Celebration","Pharma"]
+   - if added by user : fav listing 
+   - top store in ur location
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
 
-## Learn more
+2. Products
+   - see product by Store and if user have another sub store than a sub store product will show below
+   - all store appear with their signature dish.
+   - can set location as well. like search or allow app to set to current location by itself
 
-To learn more about developing your project with Expo, look at the following resources:
+3. cart
+   - see added product with store name and if in subsstore than also show that as well also
+   - e-recipt and total spending as well
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+4. profile, payment and order history
 
-## Join the community
+<!-- for the "OWNER" -->
+5. CRUD screen for Store Owner
 
-Join our community of developers creating universal apps.
+6. Manage Store, inventory and Analytics Report
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+7. 
