@@ -1,10 +1,7 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import {
     Animated,
     Dimensions,
-    FlatList,
-    NativeScrollEvent,
-    NativeSyntheticEvent,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -24,7 +21,6 @@ const offers = [
         subtitle: "Fresh veggies, dairy & more",
         cta: "Shop Now",
         bgColors: ["#ff6b35", "#f7931e"],
-        accentColor: "#fff3e0",
         emoji: "🛒",
         badge: "2h left",
         badgeUrgent: true,
@@ -36,7 +32,6 @@ const offers = [
         subtitle: "On your first 3 orders from FreshMart",
         cta: "Explore",
         bgColors: ["#11998e", "#38ef7d"],
-        accentColor: "#e0fdf4",
         emoji: "🚀",
         badge: "New",
         badgeUrgent: false,
@@ -48,7 +43,6 @@ const offers = [
         subtitle: "Snacks, beverages & frozen food",
         cta: "Grab Deal",
         bgColors: ["#7c3aed", "#a78bfa"],
-        accentColor: "#ede9fe",
         emoji: "🎉",
         badge: "Ends Sun",
         badgeUrgent: true,
@@ -60,7 +54,6 @@ const offers = [
         subtitle: "Exclusive discount for Prime members",
         cta: "Claim Now",
         bgColors: ["#0f2027", "#203a43"],
-        accentColor: "#e0f2fe",
         emoji: "👑",
         badge: "Members",
         badgeUrgent: false,
@@ -72,7 +65,6 @@ const offers = [
         subtitle: "Eggs, bread, butter & juice — ₹149",
         cta: "Add to Cart",
         bgColors: ["#f953c6", "#b91d73"],
-        accentColor: "#fce7f3",
         emoji: "🍳",
         badge: "Hot 🔥",
         badgeUrgent: true,
@@ -83,8 +75,8 @@ function OfferCard({ item }: { item: (typeof offers)[0] }) {
     return (
         <View style={[css.card, { backgroundColor: item.bgColors[0] }]}>
             <View style={[css.cardOverlay, { backgroundColor: item.bgColors[1] }]} />
-            <View style={[css.circle1, { backgroundColor: "rgba(255,255,255,0.08)" }]} />
-            <View style={[css.circle2, { backgroundColor: "rgba(255,255,255,0.06)" }]} />
+            <View style={css.circle1} />
+            <View style={css.circle2} />
 
             <View style={css.topRow}>
                 <View style={css.tag}>
@@ -109,10 +101,7 @@ function OfferCard({ item }: { item: (typeof offers)[0] }) {
                 <View style={css.textBlock}>
                     <Text style={css.title}>{item.title}</Text>
                     <Text style={css.subtitle}>{item.subtitle}</Text>
-                    <TouchableOpacity
-                        style={[css.cta, { backgroundColor: "rgba(255,255,255,0.2)" }]}
-                        activeOpacity={0.8}
-                    >
+                    <TouchableOpacity style={css.cta} activeOpacity={0.8}>
                         <Text style={css.ctaText}>{item.cta} →</Text>
                     </TouchableOpacity>
                 </View>
@@ -121,15 +110,56 @@ function OfferCard({ item }: { item: (typeof offers)[0] }) {
     );
 }
 
-export default function OfferCarousel() {
-    const [activeIndex, setActiveIndex] = useState(0);
-    const scrollX = useRef(new Animated.Value(0)).current;
-    const flatListRef = useRef<FlatList>(null);
+function AnimatedDot({ index, scrollX }: { index: number; scrollX: Animated.Value }) {
+    const inputRange = [
+        (index - 1) * ITEM_SIZE,
+        index * ITEM_SIZE,
+        (index + 1) * ITEM_SIZE,
+    ];
 
-    const onMomentumScrollEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-        const index = Math.round(e.nativeEvent.contentOffset.x / ITEM_SIZE);
-        setActiveIndex(index);
-    };
+    const dotWidth = scrollX.interpolate({
+        inputRange,
+        outputRange: [6, 20, 6],
+        extrapolate: "clamp",
+    });
+
+    const opacity = scrollX.interpolate({
+        inputRange,
+        outputRange: [0.35, 1, 0.35],
+        extrapolate: "clamp",
+    });
+
+    // interpolate between grey and purple using a 0→1 number
+    const colorProgress = scrollX.interpolate({
+        inputRange,
+        outputRange: [0, 1, 0],
+        extrapolate: "clamp",
+    });
+
+    // Animated.Color isn't available in RN — use two overlapping Views instead
+    return (
+        <View style={{ width: 20, height: 6, justifyContent: "center", alignItems: "center" }}>
+            {/* inactive (grey) base */}
+            <Animated.View
+                style={[
+                    css.dot,
+                    { width: dotWidth, opacity, backgroundColor: "#8fa0b9ff", position: "absolute" },
+                ]}
+            />
+            {/* active (purple) layer fades in on top */}
+            <Animated.View
+                style={[
+                    css.dot,
+                    { width: dotWidth, opacity: colorProgress, backgroundColor: "#7c3aed", position: "absolute" },
+                ]}
+            />
+        </View>
+    );
+}
+
+export default function OfferCarousel() {
+    const scrollX = useRef(new Animated.Value(0)).current;
+    const flatListRef = useRef<any>(null);
 
     return (
         <View style={css.wrapper}>
@@ -147,53 +177,22 @@ export default function OfferCarousel() {
                 renderItem={({ item }) => <OfferCard item={item} />}
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                // One slide at a time
-                pagingEnabled={false}
                 snapToInterval={ITEM_SIZE}
                 snapToAlignment="start"
-                decelerationRate={0.92}          // medium smooth — lower = slower stop
-                disableIntervalMomentum={true}   // enforces exactly one slide per swipe
+                decelerationRate={0.92}
+                disableIntervalMomentum={true}
                 contentContainerStyle={css.listContent}
                 onScroll={Animated.event(
                     [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-                    { useNativeDriver: true }
+                    { useNativeDriver: false }  // must be false for dot width interpolation
                 )}
                 scrollEventThrottle={16}
-                onMomentumScrollEnd={onMomentumScrollEnd}
             />
 
-            {/* Animated dots */}
             <View style={css.dots}>
-                {offers.map((_, i) => {
-                    const inputRange = [
-                        (i - 1) * ITEM_SIZE,
-                        i * ITEM_SIZE,
-                        (i + 1) * ITEM_SIZE,
-                    ];
-                    const dotWidth = scrollX.interpolate({
-                        inputRange,
-                        outputRange: [6, 20, 6],
-                        extrapolate: "clamp",
-                    });
-                    const opacity = scrollX.interpolate({
-                        inputRange,
-                        outputRange: [0.4, 1, 0.4],
-                        extrapolate: "clamp",
-                    });
-                    return (
-                        <Animated.View
-                            key={i}
-                            style={[
-                                css.dot,
-                                {
-                                    width: dotWidth,
-                                    opacity,
-                                    backgroundColor: i === activeIndex ? "#7c3aed" : "#d1d5db",
-                                },
-                            ]}
-                        />
-                    );
-                })}
+                {offers.map((_, i) => (
+                    <AnimatedDot key={i} index={i} scrollX={scrollX} />
+                ))}
             </View>
         </View>
     );
@@ -207,7 +206,6 @@ const css = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        // paddingHorizontal: 24,
         marginBottom: 12,
     },
     heading: {
@@ -222,12 +220,10 @@ const css = StyleSheet.create({
         fontWeight: "600",
     },
     listContent: {
-        // paddingHorizontal: 24,
         gap: CARD_GAP,
     },
     card: {
         width: CARD_WIDTH,
-        height: 'auto',
         borderRadius: 20,
         overflow: "hidden",
         padding: 18,
@@ -247,6 +243,7 @@ const css = StyleSheet.create({
         borderRadius: 80,
         top: -60,
         right: -40,
+        backgroundColor: "rgba(255,255,255,0.08)",
     },
     circle2: {
         position: "absolute",
@@ -255,6 +252,7 @@ const css = StyleSheet.create({
         borderRadius: 50,
         bottom: -30,
         right: 60,
+        backgroundColor: "rgba(255,255,255,0.06)",
     },
     topRow: {
         flexDirection: "row",
@@ -316,6 +314,7 @@ const css = StyleSheet.create({
         paddingVertical: 6,
         borderWidth: 1,
         borderColor: "rgba(255,255,255,0.3)",
+        backgroundColor: "rgba(255,255,255,0.2)",
     },
     ctaText: {
         color: "#fff",
