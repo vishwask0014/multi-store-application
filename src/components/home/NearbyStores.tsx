@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router'; // ← Added
 import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Swiper from 'react-native-swiper';
 import sample from '../../../assets/expo.icon/Assets/store.png';
+import { BLACK_COLOR, PRIMARY_COLOR, WHITE_COLOR } from "../theme";
 
 const { width } = Dimensions.get('window');
 
@@ -95,7 +96,7 @@ const css = StyleSheet.create({
     },
     seeAll: {
         fontSize: 13,
-        color: "#7c3aed",
+        color: PRIMARY_COLOR,
         fontWeight: "600",
     },
 
@@ -112,7 +113,7 @@ const css = StyleSheet.create({
     },
 
     card: {
-        backgroundColor: '#ffffff',
+        backgroundColor: WHITE_COLOR,
         borderRadius: 16,
         overflow: 'hidden',
         width: width * 0.9,
@@ -140,7 +141,7 @@ const css = StyleSheet.create({
     cardTitle: {
         fontSize: 18,
         lineHeight: 24,
-        color: '#242424',
+        color: BLACK_COLOR,
         fontWeight: '600',
         marginBottom: 8,
     },
@@ -191,7 +192,7 @@ const css = StyleSheet.create({
     },
 
     activeDot: {
-        backgroundColor: '#7c3aed',
+        backgroundColor: PRIMARY_COLOR,
         width: 8,
         height: 8,
         borderRadius: 4,

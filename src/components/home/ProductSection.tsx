@@ -1,5 +1,6 @@
 import { useRouter } from 'expo-router';
 import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { BLACK_COLOR, PRIMARY_COLOR, WHITE_COLOR } from '../theme';
 
 const { width } = Dimensions.get('window');
 
@@ -117,7 +118,7 @@ const css = StyleSheet.create({
     },
     seeAll: {
         fontSize: 13,
-        color: "#7c3aed",
+        color: PRIMARY_COLOR,
         fontWeight: "600",
     },
 
@@ -132,7 +133,7 @@ const css = StyleSheet.create({
     },
 
     productCard: {
-        backgroundColor: '#fff',
+        backgroundColor: WHITE_COLOR,
         borderRadius: 16,
         width: width * 0.46, // Slightly less than 50% for spacing
         overflow: 'hidden',
@@ -156,7 +157,7 @@ const css = StyleSheet.create({
     productName: {
         fontSize: 13,
         fontWeight: '600',
-        color: '#242424',
+        color: BLACK_COLOR,
         lineHeight: 18,
         marginBottom: 8,
         height: 40,
@@ -172,7 +173,7 @@ const css = StyleSheet.create({
     currentPrice: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#111',
+        color: BLACK_COLOR,
     },
 
     originalPrice: {
@@ -188,14 +189,14 @@ const css = StyleSheet.create({
     },
 
     addButton: {
-        backgroundColor: '#7c3aed',
+        backgroundColor: PRIMARY_COLOR,
         borderRadius: 8,
         paddingVertical: 9,
         alignItems: 'center',
     },
 
     addButtonText: {
-        color: '#fff',
+        color: WHITE_COLOR,
         fontSize: 13,
         fontWeight: '600',
     },

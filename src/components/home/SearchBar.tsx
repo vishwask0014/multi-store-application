@@ -1,6 +1,7 @@
 import { Search } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react-native";
 import { StyleSheet, TextInput, View } from "react-native";
+import { BORDER_COLOR } from "../theme";
 
 export default function SearchBar() {
     return (
@@ -21,8 +22,6 @@ const css = StyleSheet.create({
     inputContainer: {
         position: 'relative',
         justifyContent: 'center',
-        // paddingStart: 16,
-        // paddingEnd: 16,
     },
     icon: {
         position: 'absolute',
@@ -35,7 +34,7 @@ const css = StyleSheet.create({
         paddingVertical: 10,
         paddingRight: 10,
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: BORDER_COLOR,
         borderRadius: 8,
         height: 44,
         width: '100%',

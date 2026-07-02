@@ -1,5 +1,6 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { BORDER_COLOR, PRIMARY_COLOR, WHITE_COLOR } from "../theme";
 
 function Stars() {
     const stars = [
@@ -95,7 +96,7 @@ const css = StyleSheet.create({
         width: 180,
         height: 180,
         borderRadius: 90,
-        backgroundColor: "#7c3aed",
+        backgroundColor: PRIMARY_COLOR,
         opacity: 0.25,
         top: -60,
         right: -40,
@@ -109,14 +110,14 @@ const css = StyleSheet.create({
     },
     badge: {
         borderWidth: 1,
-        borderColor: "rgba(167,139,250,0.5)",
+        borderColor: BORDER_COLOR,
         borderRadius: 20,
         paddingHorizontal: 10,
         paddingVertical: 3,
         backgroundColor: "rgba(124,58,237,0.15)",
     },
     badgeText: {
-        color: "#a78bfa",
+        color: PRIMARY_COLOR,
         fontSize: 11,
         fontWeight: "600",
         letterSpacing: 0.5,
@@ -145,7 +146,7 @@ const css = StyleSheet.create({
         borderRadius: 12,
     },
     buttonText: {
-        color: "#fff",
+        color: WHITE_COLOR,
         fontWeight: "700",
         fontSize: 14,
         letterSpacing: 0.3,

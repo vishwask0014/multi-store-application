@@ -1,4 +1,5 @@
 
+import { PRIMARY_COLOR } from '@/components/theme';
 import { Cart, Home01Icon, Profile, SearchList01Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react-native';
 import { Tabs } from "expo-router";
@@ -30,7 +31,7 @@ export default function TabLayout() {
     return (
         <Tabs screenOptions={{
             headerShown: false,
-            tabBarActiveTintColor: '#f60000'
+            tabBarActiveTintColor: PRIMARY_COLOR
         }}>
             {
                 tabMenu.map((i, indxe) => (

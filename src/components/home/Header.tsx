@@ -2,6 +2,7 @@ import { LocationIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react-native";
 import { Image, StyleSheet, Text, View } from "react-native";
 import logo from '../../../assets/expo.icon/Assets/logo.svg';
+import { GRAY_COLOR, WHITE_COLOR } from "../theme";
 import NotificationAlert from './NotificationAlert.tsx';
 
 export default function Header() {
@@ -32,7 +33,7 @@ const css = StyleSheet.create({
         alignItems: "center",
         position: 'sticky',
         top: 0,
-        backgroundColor: '#fff',
+        backgroundColor: WHITE_COLOR,
         zIndex: 10,
         paddingTop: 16,
         paddingBottom: 16,
@@ -50,6 +51,6 @@ const css = StyleSheet.create({
         fontSize: 12,
         lineHeight: 10,
         fontWeight: 300,
-        color: '#6c6c6cff',
+        color: GRAY_COLOR,
     }
 })

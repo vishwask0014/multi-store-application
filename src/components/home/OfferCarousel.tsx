@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import { BORDER_COLOR, PRIMARY_COLOR, WHITE_COLOR } from "../theme";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_WIDTH = SCREEN_WIDTH - 48;
@@ -150,7 +151,7 @@ function AnimatedDot({ index, scrollX }: { index: number; scrollX: Animated.Valu
             <Animated.View
                 style={[
                     css.dot,
-                    { width: dotWidth, opacity: colorProgress, backgroundColor: "#7c3aed", position: "absolute" },
+                    { width: dotWidth, opacity: colorProgress, backgroundColor: PRIMARY_COLOR, position: "absolute" },
                 ]}
             />
         </View>
@@ -216,7 +217,7 @@ const css = StyleSheet.create({
     },
     seeAll: {
         fontSize: 13,
-        color: "#7c3aed",
+        color: PRIMARY_COLOR,
         fontWeight: "600",
     },
     listContent: {
@@ -267,7 +268,7 @@ const css = StyleSheet.create({
         paddingVertical: 3,
     },
     tagText: {
-        color: "#fff",
+        color: WHITE_COLOR,
         fontSize: 11,
         fontWeight: "700",
         letterSpacing: 0.3,
@@ -278,7 +279,7 @@ const css = StyleSheet.create({
         paddingVertical: 3,
     },
     badgeText: {
-        color: "#fff",
+        color: WHITE_COLOR,
         fontSize: 11,
         fontWeight: "700",
     },
@@ -295,7 +296,7 @@ const css = StyleSheet.create({
         gap: 4,
     },
     title: {
-        color: "#fff",
+        color: WHITE_COLOR,
         fontSize: 22,
         fontWeight: "800",
         lineHeight: 26,
@@ -313,11 +314,11 @@ const css = StyleSheet.create({
         paddingHorizontal: 14,
         paddingVertical: 6,
         borderWidth: 1,
-        borderColor: "rgba(255,255,255,0.3)",
+        borderColor: BORDER_COLOR,
         backgroundColor: "rgba(255,255,255,0.2)",
     },
     ctaText: {
-        color: "#fff",
+        color: WHITE_COLOR,
         fontSize: 12,
         fontWeight: "700",
     },
