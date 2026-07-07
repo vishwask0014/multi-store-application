@@ -1,8 +1,8 @@
 import { Clock, Location, Star } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react-native";
-import { useRouter } from 'expo-router'; // ← Added
-import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import Swiper from 'react-native-swiper';
+import { useRouter } from 'expo-router';
+import { useRef, useState } from "react";
+import { Dimensions, FlatList, Image, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import sample from '../../../assets/expo.icon/Assets/store.png';
 import { BLACK_COLOR, PRIMARY_COLOR, WHITE_COLOR } from "../theme";
 
@@ -14,67 +14,76 @@ const stores = [
     { id: 3, name: "QuickMart Superstore", image: sample, rating: "4.7", distance: "2.1 km", duration: "20 min" },
 ];
 
+const CARD_WIDTH = width * 0.9;
+
 export default function NearbyStores() {
     const router = useRouter();
+    const [activeIndex, setActiveIndex] = useState(0);
+    const flatListRef = useRef<FlatList>(null);
+
+    const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+        const index = Math.round(e.nativeEvent.contentOffset.x / CARD_WIDTH);
+        setActiveIndex(index);
+    };
 
     return (
         <View>
             <View style={css.header}>
                 <Text style={css.heading}>Nearby Stores</Text>
-
                 <TouchableOpacity onPress={() => router.push('/(tabs)/products')}>
                     <Text style={css.seeAll}>View All</Text>
                 </TouchableOpacity>
             </View>
 
-            {/* Carousel */}
-            <View style={css.carouselContainer}>
-                <Swiper
-                    style={css.wrapper}
-                    showsButtons={false}
-                    autoplay={false}
-                    loop={true}
-                    dotStyle={css.dot}
-                    activeDotStyle={css.activeDot}
-                    paginationStyle={css.pagination}
-                >
-                    {stores.map((store) => (
-                        <View key={store.id} style={css.slide}>
-                            <View style={css.card}>
-                                <Image source={store.image} style={css.storeImg} />
-
-                                <View style={css.cardContent}>
-                                    <Text style={css.cardTitle}>{store.name}</Text>
-
-                                    <View style={css.infoRow}>
-                                        <View style={css.reviewTag}>
-                                            <Text style={css.reviewTitle}>{store.rating}</Text>
-                                            <HugeiconsIcon
-                                                icon={Star}
-                                                size={14}
-                                                fill={'#027900'}
-                                                strokeWidth={0}
-                                            />
+            <FlatList
+                ref={flatListRef}
+                data={stores}
+                keyExtractor={(item) => String(item.id)}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                snapToInterval={CARD_WIDTH}
+                snapToAlignment="center"
+                decelerationRate="fast"
+                onScroll={onScroll}
+                scrollEventThrottle={16}
+                contentContainerStyle={css.flatListContent}
+                renderItem={({ item: store }) => (
+                    <View style={css.slide}>
+                        <View style={css.card}>
+                            <Image source={store.image} style={css.storeImg} />
+                            <View style={css.cardContent}>
+                                <Text style={css.cardTitle}>{store.name}</Text>
+                                <View style={css.infoRow}>
+                                    <View style={css.reviewTag}>
+                                        <Text style={css.reviewTitle}>{store.rating}</Text>
+                                        <HugeiconsIcon icon={Star} size={14} fill={'#027900'} strokeWidth={0} />
+                                    </View>
+                                    <View style={css.cardStatsWrapper}>
+                                        <View style={css.statItem}>
+                                            <HugeiconsIcon size={14} icon={Location} color="#666" />
+                                            <Text style={css.distance}>{store.distance}</Text>
                                         </View>
-
-
-                                        <Text style={css.cardStatsWrapper}>
-                                            <Text style={css.distance}>
-                                                <HugeiconsIcon size={16} icon={Location} />
-                                                {store.distance}
-                                            </Text>
-
-                                            <Text style={css.distance}>
-                                                <HugeiconsIcon size={16} icon={Clock} />
-                                                {store.duration}
-                                            </Text>
-                                        </Text>
+                                        <View style={css.statItem}>
+                                            <HugeiconsIcon size={14} icon={Clock} color="#666" />
+                                            <Text style={css.distance}>{store.duration}</Text>
+                                        </View>
                                     </View>
                                 </View>
                             </View>
                         </View>
-                    ))}
-                </Swiper>
+                    </View>
+                )}
+            />
+
+            {/* Pagination dots */}
+            <View style={css.dotsRow}>
+                {stores.map((_, i) => (
+                    <View
+                        key={i}
+                        style={[css.dot, i === activeIndex && css.activeDot]}
+                    />
+                ))}
             </View>
         </View>
     );
@@ -99,24 +108,17 @@ const css = StyleSheet.create({
         color: PRIMARY_COLOR,
         fontWeight: "600",
     },
-
-    carouselContainer: {
-        height: 142,
+    flatListContent: {
+        paddingHorizontal: (width - CARD_WIDTH) / 2,
     },
-
-    wrapper: { height: 142 },
-
     slide: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        width: CARD_WIDTH,
     },
-
     card: {
         backgroundColor: WHITE_COLOR,
         borderRadius: 16,
         overflow: 'hidden',
-        width: width * 0.9,
+        width: CARD_WIDTH,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -125,19 +127,16 @@ const css = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
     },
-
     storeImg: {
         width: 140,
         height: 140,
         borderTopLeftRadius: 16,
         borderBottomLeftRadius: 16,
     },
-
     cardContent: {
         padding: 16,
         flex: 1,
     },
-
     cardTitle: {
         fontSize: 18,
         lineHeight: 24,
@@ -145,11 +144,9 @@ const css = StyleSheet.create({
         fontWeight: '600',
         marginBottom: 8,
     },
-
     infoRow: {
         gap: 8,
     },
-
     reviewTag: {
         paddingHorizontal: 8,
         paddingVertical: 4,
@@ -158,46 +155,41 @@ const css = StyleSheet.create({
         flexDirection: "row",
         alignItems: 'center',
         gap: 4,
-        width: 'fit-content',
+        alignSelf: 'flex-start',
     },
-
     reviewTitle: {
         fontSize: 13,
         fontWeight: '600',
         color: '#027900',
     },
-
     cardStatsWrapper: {
-        display: 'flex',
-        gap: 20,
-        marginTop: 8,
+        flexDirection: 'row',
+        gap: 16,
+        marginTop: 4,
     },
-
+    statItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+    },
     distance: {
         fontSize: 13,
         color: '#666',
         fontWeight: '500',
-        display: 'flex',
-        gap: 4,
-        alignItems: "center"
     },
-
+    dotsRow: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 12,
+        gap: 6,
+    },
     dot: {
-        backgroundColor: '#ddd',
         width: 8,
         height: 8,
         borderRadius: 4,
-        marginLeft: 3,
-        marginRight: 3,
+        backgroundColor: '#ddd',
     },
-
     activeDot: {
         backgroundColor: PRIMARY_COLOR,
-        width: 8,
-        height: 8,
-        borderRadius: 4,
-    },
-    pagination: {
-        bottom: -24,
     },
 });
