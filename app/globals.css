@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme {
+  --color-base: #0A0F18;
+  --color-surface: #111927;
+  --color-surface-raised: #1A2438;
+  --color-border: #1E2A3D;
+  --color-border-strong: #2D3F5A;
+  --color-text-primary: #E8EDF2;
+  --color-text-secondary: #94A3B8;
+  --color-text-muted: #64748B;
+  --color-primary: #5C8374;
+  --color-primary-hover: #6f9a89;
+  --color-accent: #F5E8C7;
+  --color-accent-text: #0A0F18;
+  --color-success: #7BA88C;
+  --color-warning: #D9B26B;
+  --color-danger: #C77B6E;
+  --color-glow: rgba(92, 131, 116, 0.15);
+  --color-glow-strong: rgba(92, 131, 116, 0.3);
+  --sidebar-width: 240px;
+  --sidebar-transition: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  background: var(--color-base);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans, ui-sans-serif, system-ui, sans-serif);
+  transition: padding-left var(--sidebar-transition);
+}
+
+@media (width >= 1024px) {
+  body {
+    padding-left: var(--sidebar-width);
+  }
+}
+
+@media (width < 1024px) {
+  body {
+    padding-bottom: 72px;
+  }
+}
+
+.product-card-image .product-clip-img {
+  transition: clip-path 0.5s ease-in-out;
+  clip-path: inset(0 0 40% 0);
+}
+
+.product-card-image:hover .product-clip-img {
+  clip-path: inset(0 0 0 0) !important;
+}
+
+@keyframes twinkle1 {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+@keyframes twinkle2 {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.8; }
+}
+@keyframes twinkle3 {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.9; }
+}
+
+.star-twinkle-1 { animation: twinkle1 4s ease-in-out infinite; }
+.star-twinkle-2 { animation: twinkle2 5.5s ease-in-out infinite; }
+.star-twinkle-3 { animation: twinkle3 3.5s ease-in-out infinite; }
