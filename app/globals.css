@@ -41,15 +41,6 @@ body {
   }
 }
 
-.product-card-image .product-clip-img {
-  transition: clip-path 0.5s ease-in-out;
-  clip-path: inset(0 0 40% 0);
-}
-
-.product-card-image:hover .product-clip-img {
-  clip-path: inset(0 0 0 0) !important;
-}
-
 @keyframes twinkle1 {
   0%, 100% { opacity: 0.3; }
   50% { opacity: 1; }

@@ -14,7 +14,7 @@ import {
 import { useSidebar } from "@/app/providers";
 
 const navItems = [
-  { label: "Home", icon: HomeIcon },
+  { label: "Dashboard", icon: HomeIcon },
   { label: "Stores", icon: StoreIcon },
   { label: "Cart", icon: ShoppingCartIcon },
   { label: "Bookings", icon: CalendarIcon },
