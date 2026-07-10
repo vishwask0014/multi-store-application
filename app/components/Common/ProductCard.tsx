@@ -6,6 +6,8 @@ import {
   ShoppingBagIcon,
   CalendarIcon,
   HeartIcon,
+  ServiceIcon,
+  ArrowRightIcon,
 } from "@hugeicons/core-free-icons";
 
 interface ProductCardProps {
@@ -14,6 +16,7 @@ interface ProductCardProps {
   rating: number;
   type: "item" | "service";
   image?: string;
+  serviceName?: string;
 }
 
 export default function ProductCard({
@@ -22,6 +25,7 @@ export default function ProductCard({
   rating,
   type,
   image,
+  serviceName,
 }: ProductCardProps) {
   const TypeIcon = type === "item" ? ShoppingBagIcon : CalendarIcon;
 
@@ -53,6 +57,21 @@ export default function ProductCard({
           <span className="text-xs text-text-muted">|</span>
           <span className="text-xs text-text-muted">240 sold</span>
         </div>
+
+        {serviceName && (
+          <a
+            href="/services"
+            className="group/service inline-flex items-center gap-1 rounded-full bg-primary/8 px-2.5 py-0.5 text-[11px] font-medium text-primary ring-1 ring-primary/15 transition-all duration-200 hover:bg-primary/15 hover:ring-primary/30"
+          >
+            <HugeiconsIcon icon={ServiceIcon} size={11} />
+            Part of {serviceName}
+            <HugeiconsIcon
+              icon={ArrowRightIcon}
+              size={10}
+              className="-mr-0.5 opacity-0 transition-all duration-200 group-hover/service:opacity-100 group-hover/service:translate-x-0.5"
+            />
+          </a>
+        )}
 
         <div className="flex items-center justify-between pt-1">
           <div>

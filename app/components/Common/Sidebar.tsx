@@ -11,11 +11,15 @@ import {
   SettingsIcon,
   LogoutIcon,
   ArrowLeftIcon,
+  PackageIcon,
+  ServiceIcon,
 } from "@hugeicons/core-free-icons";
 import { useSidebar } from "@/app/providers";
 
 const navItems = [
   { label: "Dashboard", icon: HomeIcon, href: "/" },
+  { label: "Goods & Products", icon: PackageIcon, href: "/goods-products" },
+  { label: "Services", icon: ServiceIcon, href: "/services" },
   { label: "Stores", icon: StoreIcon, href: "/stores" },
   { label: "Cart", icon: ShoppingCartIcon, href: "/cart" },
   { label: "Bookings", icon: CalendarIcon, href: "/bookings" },
