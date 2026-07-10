@@ -60,7 +60,7 @@ export default function ProductCard({
 
         {serviceName && (
           <a
-            href="/services"
+            href="/dashboard/services"
             className="group/service inline-flex items-center gap-1 rounded-full bg-primary/8 px-2.5 py-0.5 text-[11px] font-medium text-primary ring-1 ring-primary/15 transition-all duration-200 hover:bg-primary/15 hover:ring-primary/30"
           >
             <HugeiconsIcon icon={ServiceIcon} size={11} />

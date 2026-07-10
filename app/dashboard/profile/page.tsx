@@ -149,7 +149,7 @@ export default function ProfilePage() {
               Payments
             </h2>
             <a
-              href="/profile/payment"
+              href="/dashboard/profile/payment"
               className="group flex items-center gap-4 rounded-xl border border-border/50 bg-surface/50 p-4 transition-all duration-200 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary/20 to-surface-raised text-primary ring-1 ring-primary/20">

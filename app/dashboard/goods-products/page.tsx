@@ -37,7 +37,7 @@ export default function GoodsProductsPage() {
               </p>
             </div>
             <a
-              href="/goods-products/create"
+              href="/dashboard/goods-products/create"
               className="group relative hidden items-center gap-2 overflow-hidden rounded-lg bg-gradient-to-r from-primary to-primary-hover px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98] sm:inline-flex"
             >
               <span className="absolute inset-0 translate-y-full bg-white/10 transition-transform duration-300 group-hover:translate-y-0" />
@@ -48,7 +48,7 @@ export default function GoodsProductsPage() {
             </a>
           </div>
           <a
-            href="/goods-products/create"
+            href="/dashboard/goods-products/create"
             className="mb-4 flex items-center justify-center gap-2 rounded-lg border border-dashed border-primary/30 bg-primary/5 px-4 py-3 text-sm font-medium text-primary transition-all duration-200 hover:bg-primary/10 sm:hidden"
           >
             <HugeiconsIcon icon={AddIcon} size={16} />
@@ -130,7 +130,7 @@ function ProductCard({
           </div>
           {svc && (
             <a
-              href="/services"
+              href="/dashboard/services"
               className="group/service inline-flex items-center gap-1 rounded-full bg-primary/8 px-2.5 py-0.5 text-[11px] font-medium text-primary ring-1 ring-primary/15 transition-all duration-200 hover:bg-primary/15 hover:ring-primary/30"
             >
               <HugeiconsIcon icon={ServiceIcon} size={11} />

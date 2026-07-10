@@ -120,7 +120,7 @@ export default function CreateServicePage() {
       <div className="mx-auto max-w-2xl">
         <div className="px-6 pt-8 pb-16 lg:px-8">
           <a
-            href="/services"
+            href="/dashboard/services"
             className="mb-6 inline-flex items-center gap-1.5 text-xs text-text-muted transition-colors hover:text-text-secondary"
           >
             <HugeiconsIcon icon={ArrowLeftIcon} size={14} />
