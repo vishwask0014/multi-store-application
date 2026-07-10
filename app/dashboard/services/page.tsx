@@ -12,7 +12,7 @@ import {
   ArrowRightIcon,
 } from "@hugeicons/core-free-icons";
 import SidebarLayout from "@/app/components/Common/SidebarLayout";
-import { services } from "@/mock";
+import { services } from "@/data";
 
 export default function ServicesPage() {
   const [expanded, setExpanded] = useState<string | null>(null);

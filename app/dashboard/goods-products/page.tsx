@@ -11,7 +11,7 @@ import {
   ArrowRightIcon,
 } from "@hugeicons/core-free-icons";
 import SidebarLayout from "@/app/components/Common/SidebarLayout";
-import { products, services } from "@/mock";
+import { products, services } from "@/data";
 
 const serviceMap = Object.fromEntries(
   services.map((s) => [s.title, s])

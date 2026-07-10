@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
-import content from "@/landingPageContent";
+import content from "@/data/landingPageContent";
 
 function NavBar() {
   return (

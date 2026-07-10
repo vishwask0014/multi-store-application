@@ -1,6 +1,6 @@
 "use client";
 
-import { products, services } from "@/mock";
+import { products, services } from "@/data";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { StarIcon, ShoppingBagIcon, CalendarIcon } from "@hugeicons/core-free-icons";
 

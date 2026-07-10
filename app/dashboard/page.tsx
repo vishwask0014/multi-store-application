@@ -4,7 +4,7 @@ import FilterBar from "@/app/components/Common/FilterBar";
 import FilterRail from "@/app/components/Common/FilterRail";
 import ProductCard from "@/app/components/Common/ProductCard";
 import StoreCard from "@/app/components/Common/StoreCard";
-import { products, stores } from "@/mock";
+import { products, stores } from "@/data";
 
 export default function Home() {
   return (

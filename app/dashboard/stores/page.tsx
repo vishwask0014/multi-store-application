@@ -9,7 +9,7 @@ import {
   AddIcon,
 } from "@hugeicons/core-free-icons";
 import SidebarLayout from "@/app/components/Common/SidebarLayout";
-import { stores } from "@/mock";
+import { stores } from "@/data";
 
 export default function StoresPage() {
   const [query, setQuery] = useState("");
