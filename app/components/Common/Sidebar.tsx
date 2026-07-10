@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   HomeIcon,
@@ -14,15 +15,16 @@ import {
 import { useSidebar } from "@/app/providers";
 
 const navItems = [
-  { label: "Dashboard", icon: HomeIcon },
-  { label: "Stores", icon: StoreIcon },
-  { label: "Cart", icon: ShoppingCartIcon },
-  { label: "Bookings", icon: CalendarIcon },
-  { label: "Profile", icon: UserIcon },
+  { label: "Dashboard", icon: HomeIcon, href: "/" },
+  { label: "Stores", icon: StoreIcon, href: "/stores" },
+  { label: "Cart", icon: ShoppingCartIcon, href: "/cart" },
+  { label: "Bookings", icon: CalendarIcon, href: "/bookings" },
+  { label: "Profile", icon: UserIcon, href: "/profile" },
 ];
 
 export default function Sidebar() {
   const { collapsed, toggle } = useSidebar();
+  const pathname = usePathname();
 
   return (
     <aside
@@ -54,51 +56,54 @@ export default function Sidebar() {
 
       <div className="flex flex-1 flex-col items-center px-2 py-4">
         <nav className="flex w-full flex-col items-center gap-1">
-          {navItems.map((item, i) => (
-            <a
-              key={item.label}
-              href="#"
-              className={`group relative flex items-center rounded-xl ${collapsed ? "justify-center" : "w-full"
-                } ${i === 0
-                  ? "bg-primary/10 text-primary"
-                  : "text-text-secondary hover:bg-surface-raised/40 hover:text-text-primary"
-                }`}
-              style={{
-                height: collapsed ? 40 : 40,
-                padding: "10px 12px",
-                gap: collapsed ? 0 : 12,
-                transition: "all 400ms cubic-bezier(0.4, 0, 0.2, 1)",
-              }}
-            >
-              <span className="flex shrink-0 items-center justify-center w-5">
-                <HugeiconsIcon icon={item.icon} size={i === 0 ? 20 : 18} />
-              </span>
-              <span
-                className="overflow-hidden whitespace-nowrap text-sm font-medium"
+          {navItems.map((item) => {
+            const active = pathname === item.href;
+            return (
+              <a
+                key={item.label}
+                href={item.href}
+                className={`group relative flex items-center rounded-xl ${collapsed ? "justify-center" : "w-full"
+                  } ${active
+                    ? "bg-primary/10 text-primary"
+                    : "text-text-secondary hover:bg-surface-raised/40 hover:text-text-primary"
+                  }`}
                 style={{
-                  maxWidth: collapsed ? 0 : 120,
-                  opacity: collapsed ? 0 : 1,
-                  transition: "max-width 400ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms cubic-bezier(0.4, 0, 0.2, 1)",
+                  height: collapsed ? 40 : 40,
+                  padding: "10px 12px",
+                  gap: collapsed ? 0 : 12,
+                  transition: "all 400ms cubic-bezier(0.4, 0, 0.2, 1)",
                 }}
               >
-                {item.label}
-              </span>
-
-              {collapsed && (
-                <span className="pointer-events-none absolute left-full ml-3 z-50 rounded-lg border border-border/50 bg-surface px-3 py-1.5 text-sm text-text-primary opacity-0 shadow-xl whitespace-nowrap group-hover:opacity-100"
-                  style={{ transition: "opacity 200ms ease" }}>
+                <span className="flex shrink-0 items-center justify-center w-5">
+                  <HugeiconsIcon icon={item.icon} size={active ? 20 : 18} />
+                </span>
+                <span
+                  className="overflow-hidden whitespace-nowrap text-sm font-medium"
+                  style={{
+                    maxWidth: collapsed ? 0 : 120,
+                    opacity: collapsed ? 0 : 1,
+                    transition: "max-width 400ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms cubic-bezier(0.4, 0, 0.2, 1)",
+                  }}
+                >
                   {item.label}
                 </span>
-              )}
-            </a>
-          ))}
+
+                {collapsed && (
+                  <span className="pointer-events-none absolute left-full ml-3 z-50 rounded-lg border border-border/50 bg-surface px-3 py-1.5 text-sm text-text-primary opacity-0 shadow-xl whitespace-nowrap group-hover:opacity-100"
+                    style={{ transition: "opacity 200ms ease" }}>
+                    {item.label}
+                  </span>
+                )}
+              </a>
+            );
+          })}
         </nav>
       </div>
 
       <div className="flex flex-col items-center border-t border-border/50 px-2 py-3">
         <a
-          href="#"
-          className="group relative flex items-center rounded-xl text-text-secondary hover:bg-surface-raised/40 hover:text-text-primary"
+          href="/settings"
+          className={`group relative flex items-center rounded-xl ${pathname === "/settings" ? "bg-primary/10 text-primary" : "text-text-secondary hover:bg-surface-raised/40 hover:text-text-primary"}`}
           style={{
             height: 40,
             width: collapsed ? 40 : "100%",
@@ -109,7 +114,7 @@ export default function Sidebar() {
           }}
         >
           <span className="flex shrink-0 items-center justify-center w-5">
-            <HugeiconsIcon icon={SettingsIcon} size={18} />
+            <HugeiconsIcon icon={SettingsIcon} size={pathname === "/settings" ? 20 : 18} />
           </span>
           <span
             className="overflow-hidden whitespace-nowrap text-sm"
