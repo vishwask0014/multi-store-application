@@ -52,7 +52,7 @@ export default function PaymentPage() {
         <div className="px-6 pt-8 pb-16 lg:px-8">
           <div className="mb-8 space-y-1">
             <a
-              href="/profile"
+              href="/dashboard/profile"
               className="mb-4 inline-flex items-center gap-1.5 text-xs text-text-muted transition-colors hover:text-text-secondary"
             >
               <HugeiconsIcon

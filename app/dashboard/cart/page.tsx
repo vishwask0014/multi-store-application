@@ -11,7 +11,7 @@ import {
   Tick01Icon,
 } from "@hugeicons/core-free-icons";
 import SidebarLayout from "@/app/components/Common/SidebarLayout";
-import { products } from "@/mock";
+import { products } from "@/data";
 
 interface CartItem {
   id: number;

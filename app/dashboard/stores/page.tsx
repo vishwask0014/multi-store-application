@@ -9,7 +9,7 @@ import {
   AddIcon,
 } from "@hugeicons/core-free-icons";
 import SidebarLayout from "@/app/components/Common/SidebarLayout";
-import { stores } from "@/mock";
+import { stores } from "@/data";
 
 export default function StoresPage() {
   const [query, setQuery] = useState("");
@@ -32,7 +32,7 @@ export default function StoresPage() {
               </p>
             </div>
             <a
-              href="/store/create"
+              href="/dashboard/store/create"
               className="group relative hidden items-center gap-2 overflow-hidden rounded-lg bg-gradient-to-r from-primary to-primary-hover px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98] sm:inline-flex"
             >
               <span className="absolute inset-0 translate-y-full bg-white/10 transition-transform duration-300 group-hover:translate-y-0" />
@@ -43,7 +43,7 @@ export default function StoresPage() {
             </a>
           </div>
           <a
-            href="/store/create"
+            href="/dashboard/store/create"
             className="mb-4 flex items-center justify-center gap-2 rounded-lg border border-dashed border-primary/30 bg-primary/5 px-4 py-3 text-sm font-medium text-primary transition-all duration-200 hover:bg-primary/10 sm:hidden"
           >
             <HugeiconsIcon icon={AddIcon} size={16} />

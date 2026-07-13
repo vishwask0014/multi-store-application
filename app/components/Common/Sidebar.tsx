@@ -5,21 +5,23 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   HomeIcon,
   StoreIcon,
-  ShoppingCartIcon,
   CalendarIcon,
   UserIcon,
   SettingsIcon,
   LogoutIcon,
   ArrowLeftIcon,
+  PackageIcon,
+  ServiceIcon,
 } from "@hugeicons/core-free-icons";
 import { useSidebar } from "@/app/providers";
 
 const navItems = [
-  { label: "Dashboard", icon: HomeIcon, href: "/" },
-  { label: "Stores", icon: StoreIcon, href: "/stores" },
-  { label: "Cart", icon: ShoppingCartIcon, href: "/cart" },
-  { label: "Bookings", icon: CalendarIcon, href: "/bookings" },
-  { label: "Profile", icon: UserIcon, href: "/profile" },
+  { label: "Dashboard", icon: HomeIcon, href: "/dashboard" },
+  { label: "Goods & Products", icon: PackageIcon, href: "/dashboard/goods-products" },
+  { label: "Services", icon: ServiceIcon, href: "/dashboard/services" },
+  { label: "Stores", icon: StoreIcon, href: "/dashboard/stores" },
+  { label: "Bookings", icon: CalendarIcon, href: "/dashboard/bookings" },
+  { label: "Profile", icon: UserIcon, href: "/dashboard/profile" },
 ];
 
 export default function Sidebar() {
@@ -102,7 +104,7 @@ export default function Sidebar() {
 
       <div className="flex flex-col items-center border-t border-border/50 px-2 py-3">
         <a
-          href="/settings"
+          href="/dashboard/settings"
           className={`group relative flex items-center rounded-xl ${pathname === "/settings" ? "bg-primary/10 text-primary" : "text-text-secondary hover:bg-surface-raised/40 hover:text-text-primary"}`}
           style={{
             height: 40,

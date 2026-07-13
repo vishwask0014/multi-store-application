@@ -66,7 +66,7 @@ export default function CreateStorePage() {
       <div className="mx-auto max-w-2xl">
         <div className="px-6 pt-8 pb-16 lg:px-8">
           <a
-            href="/stores"
+            href="/dashboard/stores"
             className="mb-6 inline-flex items-center gap-1.5 text-xs text-text-muted transition-colors hover:text-text-secondary"
           >
             <HugeiconsIcon

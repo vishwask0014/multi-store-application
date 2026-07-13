@@ -5,17 +5,15 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   HomeIcon,
   StoreIcon,
-  ShoppingCartIcon,
   CalendarIcon,
   UserIcon,
 } from "@hugeicons/core-free-icons";
 
 const navItems = [
-  { label: "Home", icon: HomeIcon, href: "/" },
-  { label: "Categories", icon: StoreIcon, href: "/categories" },
-  { label: "Cart", icon: ShoppingCartIcon, href: "/cart" },
-  { label: "Bookings", icon: CalendarIcon, href: "/bookings" },
-  { label: "Profile", icon: UserIcon, href: "/profile" },
+  { label: "Home", icon: HomeIcon, href: "/dashboard" },
+  { label: "Categories", icon: StoreIcon, href: "/dashboard/categories" },
+  { label: "Bookings", icon: CalendarIcon, href: "/dashboard/bookings" },
+  { label: "Profile", icon: UserIcon, href: "/dashboard/profile" },
 ];
 
 export default function BottomNav() {
