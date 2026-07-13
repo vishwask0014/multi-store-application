@@ -26,17 +26,22 @@ body {
   background: var(--color-base);
   color: var(--color-text-primary);
   font-family: var(--font-sans, ui-sans-serif, system-ui, sans-serif);
+}
+
+/* Sidebar/BottomNav offsets are applied by .layout-shell, not body,
+   so the landing page (no shell) is never pushed. */
+.layout-shell {
   transition: padding-left var(--sidebar-transition);
 }
 
 @media (width >= 1024px) {
-  body {
+  .layout-shell {
     padding-left: var(--sidebar-width);
   }
 }
 
 @media (width < 1024px) {
-  body {
+  .layout-shell {
     padding-bottom: 72px;
   }
 }

@@ -14,10 +14,10 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
 
 function SidebarInner({ children }: { children: React.ReactNode }) {
   return (
-    <>
+    <div className="layout-shell min-h-screen">
       <Sidebar />
       <BottomNav />
       {children}
-    </>
+    </div>
   );
 }
