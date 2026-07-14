@@ -14,6 +14,7 @@ import {
   ServiceIcon,
 } from "@hugeicons/core-free-icons";
 import { useSidebar } from "@/app/providers";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
   { label: "Dashboard", icon: HomeIcon, href: "/dashboard" },
@@ -26,6 +27,7 @@ const navItems = [
 
 export default function Sidebar() {
   const { collapsed, toggle } = useSidebar();
+  const { signOut, isOwner } = useAuth();
   const pathname = usePathname();
 
   return (
@@ -135,8 +137,8 @@ export default function Sidebar() {
             </span>
           )}
         </a>
-        <a
-          href="#"
+        <button
+          onClick={signOut}
           className="group relative flex items-center rounded-xl text-text-secondary hover:bg-surface-raised/40 hover:text-text-primary"
           style={{
             height: 40,
@@ -166,7 +168,7 @@ export default function Sidebar() {
               Log out
             </span>
           )}
-        </a>
+        </button>
       </div>
 
       <div className="flex items-center border-t border-border/50" style={{

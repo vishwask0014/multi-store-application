@@ -1,11 +1,14 @@
 "use client";
 
-import { products, services } from "@/data";
+import { useRouter } from "next/navigation";
+import { useInventoryStore } from "@/stores/useInventoryStore";
+import { useCartStore } from "@/stores/useCartStore";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { StarIcon, ShoppingBagIcon, CalendarIcon } from "@hugeicons/core-free-icons";
+import { StarIcon, ShoppingBagIcon, CalendarIcon, ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 
-interface DisplayItem {
+interface ShopItem {
   key: string;
+  id: string;
   title: string;
   price: number;
   rating: number;
@@ -14,34 +17,65 @@ interface DisplayItem {
   description?: string;
 }
 
-const allItems: DisplayItem[] = [
-  ...services.map((s) => ({
-    key: `service-${s.title}`,
-    title: s.title,
-    price: s.price,
-    rating: s.rating,
-    type: "service" as const,
-    image: s.image,
-    description: s.description,
-  })),
-  ...products.map((p) => ({
-    key: `product-${p.title}`,
-    title: p.title,
-    price: p.price,
-    rating: p.rating,
-    type: p.type as DisplayItem["type"],
-    image: p.image,
-  })),
-];
-
 export default function ShopPage() {
+  const router = useRouter();
+  const { products, services } = useInventoryStore();
+  const addItem = useCartStore((s) => s.addItem);
+  const addBooking = useCartStore((s) => s.addBooking);
+
+  const allItems: ShopItem[] = [
+    ...services.map((s) => ({
+      key: `service-${s.id}`,
+      id: s.id,
+      title: s.title,
+      price: s.price,
+      rating: s.rating,
+      type: "service" as const,
+      image: s.image,
+      description: s.description,
+    })),
+    ...products.map((p) => ({
+      key: `product-${p.id}`,
+      id: p.id,
+      title: p.title,
+      price: p.price,
+      rating: p.rating,
+      type: p.type as "item" | "service",
+      image: p.image,
+    })),
+  ];
+
+  const handleAdd = (item: ShopItem) => {
+    if (item.type === "service") {
+      addBooking({
+        title: item.title,
+        price: item.price,
+        date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString("en-US", {
+          month: "short", day: "numeric", year: "numeric",
+        }),
+        time: "10:00 AM",
+        image: item.image,
+      });
+    } else {
+      addItem({ id: item.id, title: item.title, price: item.price, type: item.type, image: item.image });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[var(--color-base)]">
       <header className="sticky top-0 z-30 border-b border-border/50 bg-base/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <div>
-            <h1 className="text-xl font-semibold text-text-primary">Browse All</h1>
-            <p className="text-sm text-text-muted">{allItems.length} items & services available</p>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.back()}
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-surface-raised/50 hover:text-text-primary"
+            >
+              <HugeiconsIcon icon={ArrowLeft02Icon} size={18} />
+            </button>
+            <div>
+              <h1 className="text-xl font-semibold text-text-primary">Browse All</h1>
+              <p className="text-sm text-text-muted">{allItems.length} items & services available</p>
+            </div>
           </div>
           <div className="flex items-center gap-2 text-xs text-text-muted">
             <span className="flex items-center gap-1">
@@ -109,8 +143,11 @@ export default function ShopPage() {
                   <p className="text-sm font-semibold text-text-primary">
                     ${item.price.toFixed(2)}
                   </p>
-                  <button className="rounded-lg bg-primary/10 px-2.5 py-1.5 text-[11px] font-medium text-primary transition-all duration-200 hover:bg-primary/20 active:scale-95">
-                    Add to cart
+                  <button
+                    onClick={() => handleAdd(item)}
+                    className="rounded-lg bg-primary/10 px-2.5 py-1.5 text-[11px] font-medium text-primary transition-all duration-200 hover:bg-primary/20 active:scale-95"
+                  >
+                    {item.type === "service" ? "Book now" : "Add to cart"}
                   </button>
                 </div>
               </div>

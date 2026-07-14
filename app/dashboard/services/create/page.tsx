@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Select from "react-select";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -11,11 +12,7 @@ import {
   Tick01Icon,
 } from "@hugeicons/core-free-icons";
 import SidebarLayout from "@/app/components/Common/SidebarLayout";
-import { products } from "@/data";
-
-const productOptions = products
-  .filter((p) => p.type === "item")
-  .map((p) => ({ value: p.title, label: p.title }));
+import { useInventoryStore } from "@/stores/useInventoryStore";
 
 const selectStyles = {
   control: (base: any, state: any) => ({
@@ -50,9 +47,7 @@ const selectStyles = {
       : state.isFocused
       ? "var(--color-surface-raised)"
       : "transparent",
-    color: state.isSelected
-      ? "#fff"
-      : "var(--color-text-primary)",
+    color: state.isSelected ? "#fff" : "var(--color-text-primary)",
     borderRadius: "0.375rem",
     padding: "8px 12px",
     fontSize: "0.875rem",
@@ -102,17 +97,45 @@ const selectStyles = {
   }),
 };
 
+const img = (id: string) =>
+  `https://images.unsplash.com/${id}?w=400&h=300&fit=crop`;
+
+const serviceImgs = [
+  "photo-1464349153735-7db50ed83c84",
+  "photo-1519741497674-611481863552",
+  "photo-1581578731548-c64695cc6952",
+];
+
 export default function CreateServicePage() {
+  const router = useRouter();
+  const { products, addService } = useInventoryStore();
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
   const [duration, setDuration] = useState("");
   const [description, setDescription] = useState("");
   const [selectedProducts, setSelectedProducts] = useState<any[]>([]);
-  const [image, setImage] = useState<File | null>(null);
+
+  const itemProducts = products.filter((p) => p.type === "item");
+  const productOptions = itemProducts.map((p) => ({ value: p.id, label: p.title }));
+
+  const valid = name.trim() && price && Number(price) > 0;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!valid) return;
+
+    addService({
+      title: name.trim(),
+      price: Number(price),
+      rating: 4.0,
+      description,
+      image: img(serviceImgs[Math.floor(Math.random() * serviceImgs.length)]),
+      productCount: selectedProducts.length,
+      productIds: selectedProducts.map((p: any) => p.value),
+    });
+
+    router.push("/dashboard/services");
   };
 
   return (
@@ -241,45 +264,12 @@ export default function CreateServicePage() {
                   className="w-full resize-none rounded-lg border border-border/50 bg-base px-4 py-2.5 text-sm text-text-primary outline-none transition-all duration-200 placeholder:text-text-muted focus:border-primary/50 focus:shadow-sm focus:shadow-primary/10"
                 />
               </div>
-
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-text-secondary">
-                  Service Image
-                </label>
-                <label className="group flex cursor-pointer items-center gap-4 rounded-xl border border-dashed border-border/50 bg-base p-4 transition-all duration-200 hover:border-primary/40">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-surface-raised/50 text-text-muted transition-colors group-hover:bg-primary/10 group-hover:text-primary">
-                    {image ? (
-                      <HugeiconsIcon icon={Tick01Icon} size={22} className="text-primary" />
-                    ) : (
-                      <HugeiconsIcon icon={ImageIcon} size={22} />
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-text-primary">
-                      {image ? image.name : "Upload service image"}
-                    </p>
-                    <p className="text-[11px] text-text-muted">
-                      {image
-                        ? `${(image.size / 1024).toFixed(1)} KB`
-                        : "JPG, PNG or WEBP up to 5MB"}
-                    </p>
-                  </div>
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept=".jpg,.jpeg,.png,.webp"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) setImage(file);
-                    }}
-                  />
-                </label>
-              </div>
             </div>
 
             <button
               type="submit"
-              className="group relative w-full overflow-hidden rounded-lg bg-gradient-to-r from-primary to-primary-hover py-3 text-sm font-medium text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98]"
+              disabled={!valid}
+              className="group relative w-full overflow-hidden rounded-lg bg-gradient-to-r from-primary to-primary-hover py-3 text-sm font-medium text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98]"
             >
               <span className="absolute inset-0 translate-x-full bg-white/10 transition-transform duration-300 group-hover:translate-x-0" />
               <span className="relative flex items-center justify-center gap-2">

@@ -9,10 +9,13 @@ import {
   AddIcon,
 } from "@hugeicons/core-free-icons";
 import SidebarLayout from "@/app/components/Common/SidebarLayout";
-import { stores } from "@/data";
+import StoreManagerModal from "@/app/components/Common/StoreManagerModal";
+import { useInventoryStore } from "@/stores/useInventoryStore";
 
 export default function StoresPage() {
+  const { stores } = useInventoryStore();
   const [query, setQuery] = useState("");
+  const [manageOpen, setManageOpen] = useState(false);
 
   const filtered = stores.filter((s) =>
     s.name.toLowerCase().includes(query.toLowerCase())
@@ -31,24 +34,24 @@ export default function StoresPage() {
                 Browse all stores on the marketplace
               </p>
             </div>
-            <a
-              href="/dashboard/store/create"
+            <button
+              onClick={() => setManageOpen(true)}
               className="group relative hidden items-center gap-2 overflow-hidden rounded-lg bg-gradient-to-r from-primary to-primary-hover px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98] sm:inline-flex"
             >
               <span className="absolute inset-0 translate-y-full bg-white/10 transition-transform duration-300 group-hover:translate-y-0" />
               <span className="relative flex items-center gap-1.5">
                 <HugeiconsIcon icon={AddIcon} size={16} />
-                Create Store
+                Manage Store
               </span>
-            </a>
+            </button>
           </div>
-          <a
-            href="/dashboard/store/create"
-            className="mb-4 flex items-center justify-center gap-2 rounded-lg border border-dashed border-primary/30 bg-primary/5 px-4 py-3 text-sm font-medium text-primary transition-all duration-200 hover:bg-primary/10 sm:hidden"
+          <button
+            onClick={() => setManageOpen(true)}
+            className="mb-4 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-primary/30 bg-primary/5 px-4 py-3 text-sm font-medium text-primary transition-all duration-200 hover:bg-primary/10 sm:hidden"
           >
             <HugeiconsIcon icon={AddIcon} size={16} />
-            Create Store
-          </a>
+            Manage Store
+          </button>
 
           <div className="relative max-w-md">
             <HugeiconsIcon
@@ -83,6 +86,8 @@ export default function StoresPage() {
           )}
         </div>
       </div>
+
+      <StoreManagerModal open={manageOpen} onClose={() => setManageOpen(false)} />
     </SidebarLayout>
   );
 }

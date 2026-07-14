@@ -75,6 +75,7 @@ function NavBar() {
               Browse
               <span className="absolute bottom-0 left-4 right-4 h-px scale-x-0 bg-primary transition-transform duration-300 group-hover:scale-x-100" />
             </Link>
+            
             <Link href="/dashboard"
               className="relative overflow-hidden rounded-xl bg-primary px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:bg-primary-hover hover:shadow-primary/30 active:scale-95">
               Open a store
@@ -250,11 +251,10 @@ function BuilderSection() {
               <div className="flex flex-wrap gap-2">
                 {b.products.map((p) => (
                   <button key={p.id} onClick={() => { setProductId(p.id); setAdded(false); }}
-                    className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 active:scale-95 ${
-                      productId === p.id
+                    className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 active:scale-95 ${productId === p.id
                         ? "border-primary/50 bg-primary/10 text-primary shadow-lg shadow-primary/10 ring-1 ring-primary/30"
                         : "border-border/50 bg-surface/60 text-text-muted hover:border-border-strong hover:text-text-primary"
-                    }`}>
+                      }`}>
                     <span className="mr-1.5">{p.emoji}</span>{p.name}
                   </button>
                 ))}
@@ -265,11 +265,10 @@ function BuilderSection() {
               <div className="flex flex-wrap gap-2">
                 {b.services.map((s) => (
                   <button key={s.id} onClick={() => { setServiceId(s.id); setAdded(false); }}
-                    className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 active:scale-95 ${
-                      serviceId === s.id
+                    className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 active:scale-95 ${serviceId === s.id
                         ? "border-accent/40 bg-accent/8 text-accent shadow-lg shadow-accent/10 ring-1 ring-accent/25"
                         : "border-border/50 bg-surface/60 text-text-muted hover:border-border-strong hover:text-text-primary"
-                    }`}>
+                      }`}>
                     {s.name}{s.price > 0 && <span className="ml-1.5 opacity-50">+${s.price}</span>}
                   </button>
                 ))}
