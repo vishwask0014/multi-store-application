@@ -1,27 +1,38 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowRightIcon,
   Tick01Icon,
   SmartPhoneIcon,
 } from "@hugeicons/core-free-icons";
+import { fbAuth, RecaptchaVerifier } from "@/lib/firebase";
+import {
+  signInWithPhoneNumber,
+  ConfirmationResult,
+} from "firebase/auth";
 
 export default function LoginPage() {
   const [step, setStep] = useState<"phone" | "otp">("phone");
+  const [confirmation, setConfirmation] = useState<ConfirmationResult | null>(null);
+  const [phone, setPhone] = useState("");
+
+  const handleSent = (c: ConfirmationResult, p: string) => {
+    setConfirmation(c);
+    setPhone(p);
+    setStep("otp");
+  };
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-base px-4">
       <Background />
-
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/8 via-transparent to-surface-raised/40" />
-
       <div className="relative z-10 w-full max-w-sm">
         <GlowOrbs />
-
         <div className="mb-10 text-center">
-          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary-hover text-xl font-medium text-white shadow-lg shadow-primary/25 ring-1 ring-white/10 transition-all duration-500 hover:scale-105 hover:shadow-xl hover:shadow-primary/30">
+          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary-hover text-xl font-medium text-white shadow-lg shadow-primary/25 ring-1 ring-white/10">
             M
           </div>
           <h1 className="text-2xl font-medium tracking-tight text-text-primary">
@@ -33,18 +44,16 @@ export default function LoginPage() {
               : "We sent a 6-digit code to your phone"}
           </p>
         </div>
-
         <div className="group relative">
           <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-b from-primary/20 via-transparent to-surface-raised/50 opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-100" />
           <div className="relative rounded-2xl border border-border/50 bg-surface/60 p-7 backdrop-blur-xl transition-all duration-500 group-hover:border-primary/20 group-hover:bg-surface/80">
             {step === "phone" ? (
-              <PhoneStep onNext={() => setStep("otp")} />
+              <PhoneStep onSent={handleSent} />
             ) : (
-              <OtpStep onBack={() => setStep("phone")} />
+              <OtpStep confirmation={confirmation} phone={phone} onBack={() => setStep("phone")} />
             )}
           </div>
         </div>
-
         <div className="mt-8 flex items-center justify-center gap-4">
           <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border/30 to-transparent" />
           <p className="text-[11px] text-text-muted">
@@ -53,6 +62,7 @@ export default function LoginPage() {
           <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border/30 to-transparent" />
         </div>
       </div>
+      <div id="recaptcha-container" />
     </div>
   );
 }
@@ -99,15 +109,46 @@ function GlowOrbs() {
   );
 }
 
-function PhoneStep({ onNext }: { onNext: () => void }) {
+function PhoneStep({ onSent }: { onSent: (c: ConfirmationResult, phone: string) => void }) {
   const [phone, setPhone] = useState("");
   const [focused, setFocused] = useState(false);
-  const valid = phone.replace(/\D/g, "").length === 10;
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
+  const verifierRef = useRef<RecaptchaVerifier | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const valid = phone.replace(/\D/g, "").length === 10;
 
   useEffect(() => {
     inputRef.current?.focus();
+    verifierRef.current = new RecaptchaVerifier(fbAuth, "recaptcha-container", {
+      size: "invisible",
+    });
+    return () => {
+      verifierRef.current?.clear();
+    };
   }, []);
+
+  const handleSend = async () => {
+    if (!valid || sending) return;
+    setSending(true);
+    setError("");
+    try {
+      const verifier = verifierRef.current!;
+      const fullPhone = "+91" + phone.replace(/\D/g, "");
+      const c = await signInWithPhoneNumber(fbAuth, fullPhone, verifier);
+      verifierRef.current = null;
+      onSent(c, fullPhone);
+    } catch (e: any) {
+      setError(e?.message || "Failed to send code. Try again.");
+      verifierRef.current?.clear();
+      verifierRef.current = new RecaptchaVerifier(fbAuth, "recaptcha-container", {
+        size: "invisible",
+      });
+    } finally {
+      setSending(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -138,7 +179,7 @@ function PhoneStep({ onNext }: { onNext: () => void }) {
             onChange={(e) =>
               setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
             }
-            onKeyDown={(e) => e.key === "Enter" && valid && onNext()}
+            onKeyDown={(e) => e.key === "Enter" && valid && handleSend()}
             placeholder="Enter your number"
             className="flex-1 bg-transparent text-sm text-text-primary outline-none placeholder:text-text-muted tracking-wider"
           />
@@ -148,29 +189,45 @@ function PhoneStep({ onNext }: { onNext: () => void }) {
             </div>
           )}
         </div>
+        {error && (
+          <p className="text-xs text-danger">{error}</p>
+        )}
       </div>
 
       <button
-        disabled={!valid}
-        onClick={onNext}
+        disabled={!valid || sending}
+        onClick={handleSend}
         className="group relative w-full overflow-hidden rounded-lg bg-gradient-to-r from-primary to-primary-hover py-3 text-sm font-medium text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98]"
       >
         <span className="absolute inset-0 translate-y-full bg-white/10 transition-transform duration-300 group-hover:translate-y-0" />
         <span className="relative flex items-center justify-center gap-2">
-          Continue
-          <HugeiconsIcon
-            icon={ArrowRightIcon}
-            size={16}
-            className="transition-transform duration-300 group-hover:translate-x-0.5"
-          />
+          {sending ? "Sending..." : "Continue"}
+          {!sending && (
+            <HugeiconsIcon
+              icon={ArrowRightIcon}
+              size={16}
+              className="transition-transform duration-300 group-hover:translate-x-0.5"
+            />
+          )}
         </span>
       </button>
     </div>
   );
 }
 
-function OtpStep({ onBack }: { onBack: () => void }) {
+function OtpStep({
+  confirmation,
+  phone,
+  onBack,
+}: {
+  confirmation: ConfirmationResult | null;
+  phone: string;
+  onBack: () => void;
+}) {
+  const router = useRouter();
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [verifying, setVerifying] = useState(false);
+  const [error, setError] = useState("");
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
@@ -202,6 +259,21 @@ function OtpStep({ onBack }: { onBack: () => void }) {
   };
 
   const isComplete = otp.every((d) => d);
+
+  const handleVerify = async () => {
+    if (!isComplete || verifying || !confirmation) return;
+    setVerifying(true);
+    setError("");
+    try {
+      await confirmation.confirm(otp.join(""));
+      router.replace("/shop");
+    } catch (e: any) {
+      setError(e?.message || "Invalid code. Try again.");
+    } finally {
+      setVerifying(false);
+    }
+  };
+
   const [resending, setResending] = useState(false);
   const [cooldown, setCooldown] = useState(0);
 
@@ -254,18 +326,25 @@ function OtpStep({ onBack }: { onBack: () => void }) {
         ))}
       </div>
 
+      {error && (
+        <p className="text-center text-xs text-danger">{error}</p>
+      )}
+
       <button
-        disabled={!isComplete}
+        disabled={!isComplete || verifying}
+        onClick={handleVerify}
         className="group relative w-full overflow-hidden rounded-lg bg-gradient-to-r from-primary to-primary-hover py-3 text-sm font-medium text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98]"
       >
         <span className="absolute inset-0 translate-x-full bg-white/10 transition-transform duration-300 group-hover:translate-x-0" />
         <span className="relative flex items-center justify-center gap-2">
-          Verify OTP
-          <HugeiconsIcon
-            icon={ArrowRightIcon}
-            size={16}
-            className="transition-transform duration-300 group-hover:translate-x-0.5"
-          />
+          {verifying ? "Verifying..." : "Verify OTP"}
+          {!verifying && (
+            <HugeiconsIcon
+              icon={ArrowRightIcon}
+              size={16}
+              className="transition-transform duration-300 group-hover:translate-x-0.5"
+            />
+          )}
         </span>
       </button>
 

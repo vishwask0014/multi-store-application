@@ -14,18 +14,26 @@ import {
   ServiceIcon,
 } from "@hugeicons/core-free-icons";
 import { useSidebar } from "@/app/providers";
+import { useAuth } from "@/contexts/AuthContext";
+
+import { ShoppingCartIcon, Notification03Icon, BookHeartIcon, BarChartIcon } from "@hugeicons/core-free-icons";
 
 const navItems = [
   { label: "Dashboard", icon: HomeIcon, href: "/dashboard" },
+  { label: "Orders", icon: ShoppingCartIcon, href: "/dashboard/orders" },
   { label: "Goods & Products", icon: PackageIcon, href: "/dashboard/goods-products" },
   { label: "Services", icon: ServiceIcon, href: "/dashboard/services" },
   { label: "Stores", icon: StoreIcon, href: "/dashboard/stores" },
   { label: "Bookings", icon: CalendarIcon, href: "/dashboard/bookings" },
+  { label: "Wishlist", icon: BookHeartIcon, href: "/dashboard/wishlist" },
+  { label: "Analytics", icon: BarChartIcon, href: "/dashboard/analytics" },
+  { label: "Notifications", icon: Notification03Icon, href: "/dashboard/notifications" },
   { label: "Profile", icon: UserIcon, href: "/dashboard/profile" },
 ];
 
 export default function Sidebar() {
   const { collapsed, toggle } = useSidebar();
+  const { signOut, isOwner } = useAuth();
   const pathname = usePathname();
 
   return (
@@ -135,8 +143,8 @@ export default function Sidebar() {
             </span>
           )}
         </a>
-        <a
-          href="#"
+        <button
+          onClick={signOut}
           className="group relative flex items-center rounded-xl text-text-secondary hover:bg-surface-raised/40 hover:text-text-primary"
           style={{
             height: 40,
@@ -166,7 +174,7 @@ export default function Sidebar() {
               Log out
             </span>
           )}
-        </a>
+        </button>
       </div>
 
       <div className="flex items-center border-t border-border/50" style={{

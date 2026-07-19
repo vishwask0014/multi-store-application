@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ShoppingCartIcon,
@@ -11,57 +12,56 @@ import {
   Tick01Icon,
 } from "@hugeicons/core-free-icons";
 import SidebarLayout from "@/app/components/Common/SidebarLayout";
-import { products } from "@/data";
-
-interface CartItem {
-  id: number;
-  title: string;
-  price: number;
-  quantity: number;
-  type: "item" | "service";
-}
-
-interface BookingItem {
-  id: number;
-  title: string;
-  price: number;
-  date: string;
-  time: string;
-}
+import { useCartStore } from "@/stores/useCartStore";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    { id: 1, title: "Wireless Headphones", price: 79.99, quantity: 1, type: "item" },
-    { id: 2, title: "Leather Notebook", price: 24.99, quantity: 2, type: "item" },
-    { id: 3, title: "Mechanical Keyboard", price: 149.99, quantity: 1, type: "item" },
-  ]);
+  const { items, bookings, updateQuantity, removeItem, removeBooking, clearCart } = useCartStore();
+  const { firebaseUser, mongoUser } = useAuth();
+  const router = useRouter();
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState("");
 
-  const [bookings, setBookings] = useState<BookingItem[]>([
-    { id: 1, title: "Yoga Class Pass", price: 25, date: "Mar 15, 2026", time: "10:00 AM" },
-    { id: 2, title: "Spa Massage", price: 85, date: "Mar 18, 2026", time: "2:30 PM" },
-  ]);
-
-  const updateQty = (id: number, delta: number) => {
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + delta) }
-          : item
-      )
-    );
-  };
-
-  const removeItem = (id: number) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const removeBooking = (id: number) => {
-    setBookings((prev) => prev.filter((b) => b.id !== id));
-  };
-
-  const itemTotal = cartItems.reduce((s, i) => s + i.price * i.quantity, 0);
+  const itemTotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const bookingTotal = bookings.reduce((s, b) => s + b.price, 0);
   const grandTotal = itemTotal + bookingTotal;
+
+  const handleCheckout = async () => {
+    setCheckoutError("");
+    setCheckingOut(true);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: firebaseUser?.uid,
+          mongoUserId: mongoUser?.id,
+          items: items.map((i) => ({ id: i.id, title: i.title, price: i.price, quantity: i.quantity })),
+          bookings: bookings.map((b) => ({ id: b.id, title: b.title, price: b.price, date: b.date, time: b.time, image: b.image })),
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Checkout failed");
+      }
+
+      const data = await res.json();
+      clearCart();
+
+      if (data.orders?.length > 0 && data.bookings?.length > 0) {
+        router.push("/dashboard/orders");
+      } else if (data.orders?.length > 0) {
+        router.push("/dashboard/orders");
+      } else if (data.bookings?.length > 0) {
+        router.push("/dashboard/bookings");
+      }
+    } catch (err: any) {
+      setCheckoutError(err.message);
+    } finally {
+      setCheckingOut(false);
+    }
+  };
 
   return (
     <SidebarLayout>
@@ -72,39 +72,39 @@ export default function CartPage() {
               Cart
             </h1>
             <p className="text-sm text-text-muted">
-              {cartItems.length + bookings.length} item{cartItems.length + bookings.length !== 1 ? "s" : ""} in your cart
+              {items.length + bookings.length} item{items.length + bookings.length !== 1 ? "s" : ""} in your cart
             </p>
           </div>
 
-          {cartItems.length > 0 && (
+          {items.length > 0 && (
             <section className="mb-10">
               <h2 className="mb-4 text-[11px] font-medium uppercase tracking-[0.15em] text-text-muted">
                 Items
               </h2>
               <div className="space-y-3">
-                {cartItems.map((item) => (
+                {items.map((item) => (
                   <div
                     key={item.id}
                     className="flex items-center gap-4 rounded-xl border border-border/50 bg-surface/50 p-4 transition-all duration-200 hover:border-border-strong/50"
                   >
                     <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-surface-raised to-surface ring-1 ring-border/50">
                       <img
-                        src={products.find((p) => p.title === item.title)?.image}
+                        src={item.image}
                         alt={item.title}
                         className="h-full w-full object-cover"
                       />
                     </div>
-                    <div className="flex-1 space-y-1">
-                      <p className="text-sm font-medium text-text-primary">
+                    <div className="flex-1 min-w-0 space-y-1">
+                      <p className="text-sm font-medium text-text-primary truncate">
                         {item.title}
                       </p>
                       <p className="text-sm text-accent">
                         ${item.price.toFixed(2)}
                       </p>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 shrink-0">
                       <button
-                        onClick={() => updateQty(item.id, -1)}
+                        onClick={() => updateQuantity(item.id, -1)}
                         className="flex h-7 w-7 items-center justify-center rounded-md border border-border/50 text-text-secondary transition-all duration-200 hover:bg-surface-raised/50 hover:text-text-primary"
                       >
                         <HugeiconsIcon icon={MinusSignIcon} size={14} />
@@ -113,7 +113,7 @@ export default function CartPage() {
                         {item.quantity}
                       </span>
                       <button
-                        onClick={() => updateQty(item.id, 1)}
+                        onClick={() => updateQuantity(item.id, 1)}
                         className="flex h-7 w-7 items-center justify-center rounded-md border border-border/50 text-text-secondary transition-all duration-200 hover:bg-surface-raised/50 hover:text-text-primary"
                       >
                         <HugeiconsIcon icon={AddIcon} size={14} />
@@ -145,8 +145,8 @@ export default function CartPage() {
                     <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-surface-raised to-surface text-text-muted ring-1 ring-border/50">
                       <HugeiconsIcon icon={CalendarIcon} size={24} />
                     </div>
-                    <div className="flex-1 space-y-1">
-                      <p className="text-sm font-medium text-text-primary">
+                    <div className="flex-1 min-w-0 space-y-1">
+                      <p className="text-sm font-medium text-text-primary truncate">
                         {b.title}
                       </p>
                       <p className="text-xs text-text-muted">
@@ -166,7 +166,7 @@ export default function CartPage() {
             </section>
           )}
 
-          {cartItems.length === 0 && bookings.length === 0 && (
+          {items.length === 0 && bookings.length === 0 && (
             <div className="mt-16 text-center">
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-raised/50 text-text-muted ring-1 ring-border/50">
                 <HugeiconsIcon icon={ShoppingCartIcon} size={28} />
@@ -175,9 +175,9 @@ export default function CartPage() {
             </div>
           )}
 
-          {(cartItems.length > 0 || bookings.length > 0) && (
+          {(items.length > 0 || bookings.length > 0) && (
             <div className="rounded-xl border border-border/50 bg-surface/80 p-6 backdrop-blur-sm">
-              {cartItems.length > 0 && (
+              {items.length > 0 && (
                 <div className="mb-3 flex items-center justify-between text-sm">
                   <span className="text-text-secondary">Items subtotal</span>
                   <span className="text-text-primary">${itemTotal.toFixed(2)}</span>
@@ -196,11 +196,19 @@ export default function CartPage() {
                   ${grandTotal.toFixed(2)}
                 </span>
               </div>
-              <button className="group relative w-full overflow-hidden rounded-lg bg-gradient-to-r from-primary to-primary-hover py-3 text-sm font-medium text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98]">
+              {checkoutError && (
+                <p className="mb-3 text-xs text-danger">{checkoutError}</p>
+              )}
+              <button onClick={handleCheckout} disabled={checkingOut}
+                className="group relative w-full overflow-hidden rounded-lg bg-gradient-to-r from-primary to-primary-hover py-3 text-sm font-medium text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98] disabled:opacity-50">
                 <span className="absolute inset-0 translate-y-full bg-white/10 transition-transform duration-300 group-hover:translate-y-0" />
                 <span className="relative flex items-center justify-center gap-2">
-                  <HugeiconsIcon icon={Tick01Icon} size={16} />
-                  Proceed to Checkout
+                  {checkingOut ? (
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  ) : (
+                    <HugeiconsIcon icon={Tick01Icon} size={16} />
+                  )}
+                  {checkingOut ? "Processing..." : "Proceed to Checkout"}
                 </span>
               </button>
             </div>

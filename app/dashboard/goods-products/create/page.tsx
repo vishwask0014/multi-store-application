@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   PackageIcon,
@@ -9,17 +10,41 @@ import {
   Tick01Icon,
 } from "@hugeicons/core-free-icons";
 import SidebarLayout from "@/app/components/Common/SidebarLayout";
+import { useInventoryStore } from "@/stores/useInventoryStore";
+
+const img = (id: string) =>
+  `https://images.unsplash.com/${id}?w=400&h=300&fit=crop`;
+
+const placeholderImgs = [
+  "photo-1505740420928-5e560c06d30e",
+  "photo-1544367567-0f2fcb009e0b",
+  "photo-1531346878377-1270d5fe5b8b",
+];
 
 export default function CreateProductPage() {
+  const router = useRouter();
+  const addProduct = useInventoryStore((s) => s.addProduct);
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
   const [stock, setStock] = useState("");
   const [description, setDescription] = useState("");
-  const [image, setImage] = useState<File | null>(null);
+
+  const valid = name.trim() && price && Number(price) > 0;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!valid) return;
+
+    addProduct({
+      title: name.trim(),
+      price: Number(price),
+      rating: 4.0,
+      type: "item",
+      image: img(placeholderImgs[Math.floor(Math.random() * placeholderImgs.length)]),
+    });
+
+    router.push("/dashboard/goods-products");
   };
 
   return (
@@ -122,45 +147,12 @@ export default function CreateProductPage() {
                   className="w-full resize-none rounded-lg border border-border/50 bg-base px-4 py-2.5 text-sm text-text-primary outline-none transition-all duration-200 placeholder:text-text-muted focus:border-primary/50 focus:shadow-sm focus:shadow-primary/10"
                 />
               </div>
-
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-text-secondary">
-                  Product Image
-                </label>
-                <label className="group flex cursor-pointer items-center gap-4 rounded-xl border border-dashed border-border/50 bg-base p-4 transition-all duration-200 hover:border-primary/40">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-surface-raised/50 text-text-muted transition-colors group-hover:bg-primary/10 group-hover:text-primary">
-                    {image ? (
-                      <HugeiconsIcon icon={Tick01Icon} size={22} className="text-primary" />
-                    ) : (
-                      <HugeiconsIcon icon={ImageIcon} size={22} />
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-text-primary">
-                      {image ? image.name : "Upload product image"}
-                    </p>
-                    <p className="text-[11px] text-text-muted">
-                      {image
-                        ? `${(image.size / 1024).toFixed(1)} KB`
-                        : "JPG, PNG or WEBP up to 5MB"}
-                    </p>
-                  </div>
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept=".jpg,.jpeg,.png,.webp"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) setImage(file);
-                    }}
-                  />
-                </label>
-              </div>
             </div>
 
             <button
               type="submit"
-              className="group relative w-full overflow-hidden rounded-lg bg-gradient-to-r from-primary to-primary-hover py-3 text-sm font-medium text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98]"
+              disabled={!valid}
+              className="group relative w-full overflow-hidden rounded-lg bg-gradient-to-r from-primary to-primary-hover py-3 text-sm font-medium text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98]"
             >
               <span className="absolute inset-0 translate-x-full bg-white/10 transition-transform duration-300 group-hover:translate-x-0" />
               <span className="relative flex items-center justify-center gap-2">

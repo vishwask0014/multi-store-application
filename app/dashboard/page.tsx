@@ -1,12 +1,16 @@
+"use client";
+
 import SidebarLayout from "@/app/components/Common/SidebarLayout";
 import HeroBanner from "@/app/components/Common/HeroBanner";
 import FilterBar from "@/app/components/Common/FilterBar";
 import FilterRail from "@/app/components/Common/FilterRail";
 import ProductCard from "@/app/components/Common/ProductCard";
 import StoreCard from "@/app/components/Common/StoreCard";
-import { products, stores } from "@/data";
+import { useInventoryStore } from "@/stores/useInventoryStore";
 
 export default function Home() {
+  const { products, stores } = useInventoryStore();
+
   return (
     <SidebarLayout>
       <div className="mx-auto max-w-7xl">

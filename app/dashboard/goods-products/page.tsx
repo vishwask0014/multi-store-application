@@ -11,13 +11,17 @@ import {
   ArrowRightIcon,
 } from "@hugeicons/core-free-icons";
 import SidebarLayout from "@/app/components/Common/SidebarLayout";
-import { products, services } from "@/data";
-
-const serviceMap = Object.fromEntries(
-  services.map((s) => [s.title, s])
-);
+import { useInventoryStore } from "@/stores/useInventoryStore";
+import { useCartStore } from "@/stores/useCartStore";
 
 export default function GoodsProductsPage() {
+  const { products, services } = useInventoryStore();
+  const addItem = useCartStore((s) => s.addItem);
+
+  const serviceMap = Object.fromEntries(
+    services.map((s) => [s.id, s])
+  );
+
   return (
     <SidebarLayout>
       <div className="mx-auto max-w-7xl">
@@ -64,13 +68,13 @@ export default function GoodsProductsPage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {products.map((p) => (
-              <ProductCard key={p.title} {...p} />
-            ))}
-          </div>
-
-          {products.length === 0 && (
+          {products.length > 0 ? (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {products.map((p) => (
+                <ProductCard key={p.id} product={p} serviceMap={serviceMap} onAddToCart={addItem} />
+              ))}
+            </div>
+          ) : (
             <div className="mt-20 text-center">
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-raised/50 text-text-muted ring-1 ring-border/50">
                 <HugeiconsIcon icon={ShoppingBagIcon} size={28} />
@@ -85,45 +89,40 @@ export default function GoodsProductsPage() {
 }
 
 function ProductCard({
-  title,
-  price,
-  rating,
-  image,
-  serviceName,
+  product,
+  serviceMap,
+  onAddToCart,
 }: {
-  title: string;
-  price: number;
-  rating: number;
-  type: string;
-  image?: string;
-  serviceName?: string;
+  product: { id: string; title: string; price: number; rating: number; type: string; image: string; serviceName?: string };
+  serviceMap: Record<string, any>;
+  onAddToCart: (item: any) => void;
 }) {
-  const svc = serviceName ? serviceMap[serviceName] : null;
+  const svc = product.serviceName
+    ? Object.values(serviceMap).find((s: any) => s.title === product.serviceName)
+    : null;
 
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-xl border border-border/50 bg-surface transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10">
       <div className="relative aspect-[4/3] bg-gradient-to-br from-surface-raised to-surface">
-        {image && (
-          <img
-            src={image}
-            alt={title}
-            className="h-full w-full object-cover"
-          />
-        )}
+        <img
+          src={product.image}
+          alt={product.title}
+          className="h-full w-full object-cover"
+        />
         <button className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-lg bg-base/60 text-text-muted backdrop-blur-sm transition-colors hover:bg-base/80 hover:text-red-400">
           <HugeiconsIcon icon={HeartIcon} size={14} />
         </button>
       </div>
       <div className="flex flex-1 flex-col justify-between space-y-2 p-4">
         <h3 className="text-sm font-medium leading-snug text-text-primary line-clamp-2">
-          {title}
+          {product.title}
         </h3>
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1 rounded-md bg-warning/10 px-1.5 py-0.5">
               <HugeiconsIcon icon={StarIcon} size={11} className="text-warning" />
               <span className="text-[11px] font-medium text-warning">
-                {rating.toFixed(1)}
+                {product.rating.toFixed(1)}
               </span>
             </div>
             <span className="text-xs text-text-muted">240 sold</span>
@@ -145,13 +144,16 @@ function ProductCard({
           <div className="flex items-center justify-between pt-0.5">
             <div>
               <p className="text-sm font-semibold text-accent">
-                ${price.toFixed(2)}
+                ${product.price.toFixed(2)}
               </p>
               <p className="text-[11px] text-text-muted line-through">
-                ${(price * 1.25).toFixed(2)}
+                ${(product.price * 1.25).toFixed(2)}
               </p>
             </div>
-            <button className="rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20">
+            <button
+              onClick={() => onAddToCart({ id: product.id, title: product.title, price: product.price, type: product.type, image: product.image })}
+              className="rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+            >
               Add to cart
             </button>
           </div>
