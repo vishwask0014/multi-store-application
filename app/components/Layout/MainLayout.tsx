@@ -1,11 +1,3 @@
-import { Children } from "react";
-
-export default function MainLayout({ Children }: any) {
-    return (
-        <>
-            <div className="">
-                {Children}
-            </div>
-        </>
-    )
+export default function MainLayout({ children }: { children: React.ReactNode }) {
+  return <div className="">{children}</div>;
 }

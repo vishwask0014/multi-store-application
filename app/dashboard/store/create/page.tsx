@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Store01Icon,
@@ -16,6 +17,8 @@ import {
   UploadIcon,
 } from "@hugeicons/core-free-icons";
 import SidebarLayout from "@/app/components/Common/SidebarLayout";
+import { useAuth } from "@/contexts/AuthContext";
+import { useInventoryStore } from "@/stores/useInventoryStore";
 
 const steps = [
   { label: "Store Info", icon: Store01Icon },
@@ -27,6 +30,10 @@ type StoreType = "products" | "services" | "both";
 type CoverageType = "single" | "multiple";
 
 export default function CreateStorePage() {
+  const router = useRouter();
+  const { firebaseUser } = useAuth();
+  const { addStore } = useInventoryStore();
+  const [submitting, setSubmitting] = useState(false);
   const [step, setStep] = useState(0);
   const [storeType, setStoreType] = useState<StoreType | "">("");
   const [storeName, setStoreName] = useState("");
@@ -430,16 +437,31 @@ export default function CreateStorePage() {
               </button>
             ) : (
               <button
-                disabled={!canProceed()}
-                onClick={() => {
-                  /* submit */
+                disabled={!canProceed() || submitting}
+                onClick={async () => {
+                  setSubmitting(true);
+                  try {
+                    await addStore({
+                      name: storeName,
+                      tag: "Fulfilled",
+                      images: [],
+                      ownerUid: firebaseUser?.uid || "",
+                      description,
+                      address,
+                      city,
+                      coverage,
+                    });
+                    router.push("/dashboard/stores");
+                  } catch {
+                    setSubmitting(false);
+                  }
                 }}
                 className="group relative overflow-hidden rounded-lg bg-gradient-to-r from-primary to-primary-hover px-6 py-2.5 text-sm font-medium text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 disabled:cursor-not-allowed disabled:opacity-30"
               >
                 <span className="absolute inset-0 translate-x-full bg-white/10 transition-transform duration-300 group-hover:translate-x-0" />
                 <span className="relative flex items-center gap-1.5">
                   <HugeiconsIcon icon={Tick01Icon} size={16} />
-                  Submit Store
+                  {submitting ? "Submitting..." : "Submit Store"}
                 </span>
               </button>
             )}

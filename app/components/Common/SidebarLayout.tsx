@@ -50,7 +50,6 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
 
     if (!mongoUser) {
       setGateChecked(true);
-      setGateChecked(true);
       return;
     }
 

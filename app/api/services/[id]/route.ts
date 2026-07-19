@@ -1,25 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
-import { connectDB } from "@/lib/mongodb";
-import { Service } from "@/lib/models/Service";
+import { getServiceById, updateService, softDeleteService, restoreService, hardDeleteService } from "@/lib/services/service";
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  await connectDB();
-  const service = await Service.findById(id).populate("products").lean();
+  const service = await getServiceById(id);
   if (!service) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json(service);
 }
 
-export async function DELETE(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  await connectDB();
-  const service = await Service.findByIdAndDelete(id);
+  const body = await req.json();
+  const service = await updateService(id, body);
   if (!service) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  return NextResponse.json({ success: true });
+  return NextResponse.json(service);
+}
+
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const url = new URL(req.url);
+  const permanent = url.searchParams.get("permanent") === "true";
+
+  const service = permanent ? await hardDeleteService(id) : await softDeleteService(id);
+  if (!service) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  return NextResponse.json({ success: true, deleted: true });
 }

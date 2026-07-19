@@ -16,6 +16,17 @@ import { fbAuth } from "@/lib/firebase";
 import type { MongoUserData } from "@/lib/services/auth";
 import type { UserRole, OwnerStatus } from "@/lib/models/User";
 
+function setCookie(name: string, value: string, days = 7) {
+  if (typeof document === "undefined") return;
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+}
+
+function removeCookie(name: string) {
+  if (typeof document === "undefined") return;
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax`;
+}
+
 interface AuthState {
   firebaseUser: FirebaseUser | null;
   mongoUser: MongoUserData | null;
@@ -105,10 +116,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AuthState>(initialState);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(fbAuth, (fbUser) => {
-      console.log("[Auth] onAuthStateChanged:", fbUser?.uid, fbUser?.phoneNumber);
-
+    const unsub = onAuthStateChanged(fbAuth, async (fbUser) => {
       if (fbUser) {
+        setCookie("uid", fbUser.uid);
+        const token = await fbUser.getIdToken().catch(() => null);
+        if (token) setCookie("__session", token);
+
         setState((prev) => ({
           ...prev,
           firebaseUser: fbUser,
@@ -116,7 +129,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }));
 
         syncMongoUser(fbUser).then((mongoUser) => {
-          console.log("[Auth] sync result:", mongoUser ? "saved" : "failed");
           if (mongoUser) {
             setState((prev) => ({
               ...prev,
@@ -126,6 +138,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         });
       } else {
+        removeCookie("__session");
+        removeCookie("uid");
         setState({
           firebaseUser: null,
           mongoUser: null,
@@ -142,6 +156,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = useCallback(async () => {
     await fbSignOut(fbAuth);
+    removeCookie("__session");
+    removeCookie("uid");
     setState({
       firebaseUser: null,
       mongoUser: null,

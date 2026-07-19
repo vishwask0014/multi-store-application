@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ShoppingCartIcon,
@@ -11,13 +13,55 @@ import {
 } from "@hugeicons/core-free-icons";
 import SidebarLayout from "@/app/components/Common/SidebarLayout";
 import { useCartStore } from "@/stores/useCartStore";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function CartPage() {
-  const { items, bookings, updateQuantity, removeItem, removeBooking } = useCartStore();
+  const { items, bookings, updateQuantity, removeItem, removeBooking, clearCart } = useCartStore();
+  const { firebaseUser, mongoUser } = useAuth();
+  const router = useRouter();
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState("");
 
   const itemTotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const bookingTotal = bookings.reduce((s, b) => s + b.price, 0);
   const grandTotal = itemTotal + bookingTotal;
+
+  const handleCheckout = async () => {
+    setCheckoutError("");
+    setCheckingOut(true);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: firebaseUser?.uid,
+          mongoUserId: mongoUser?.id,
+          items: items.map((i) => ({ id: i.id, title: i.title, price: i.price, quantity: i.quantity })),
+          bookings: bookings.map((b) => ({ id: b.id, title: b.title, price: b.price, date: b.date, time: b.time, image: b.image })),
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Checkout failed");
+      }
+
+      const data = await res.json();
+      clearCart();
+
+      if (data.orders?.length > 0 && data.bookings?.length > 0) {
+        router.push("/dashboard/orders");
+      } else if (data.orders?.length > 0) {
+        router.push("/dashboard/orders");
+      } else if (data.bookings?.length > 0) {
+        router.push("/dashboard/bookings");
+      }
+    } catch (err: any) {
+      setCheckoutError(err.message);
+    } finally {
+      setCheckingOut(false);
+    }
+  };
 
   return (
     <SidebarLayout>
@@ -152,11 +196,19 @@ export default function CartPage() {
                   ${grandTotal.toFixed(2)}
                 </span>
               </div>
-              <button className="group relative w-full overflow-hidden rounded-lg bg-gradient-to-r from-primary to-primary-hover py-3 text-sm font-medium text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98]">
+              {checkoutError && (
+                <p className="mb-3 text-xs text-danger">{checkoutError}</p>
+              )}
+              <button onClick={handleCheckout} disabled={checkingOut}
+                className="group relative w-full overflow-hidden rounded-lg bg-gradient-to-r from-primary to-primary-hover py-3 text-sm font-medium text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98] disabled:opacity-50">
                 <span className="absolute inset-0 translate-y-full bg-white/10 transition-transform duration-300 group-hover:translate-y-0" />
                 <span className="relative flex items-center justify-center gap-2">
-                  <HugeiconsIcon icon={Tick01Icon} size={16} />
-                  Proceed to Checkout
+                  {checkingOut ? (
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  ) : (
+                    <HugeiconsIcon icon={Tick01Icon} size={16} />
+                  )}
+                  {checkingOut ? "Processing..." : "Proceed to Checkout"}
                 </span>
               </button>
             </div>
